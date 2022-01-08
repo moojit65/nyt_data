@@ -1,0 +1,2421 @@
+<html>
+<head>
+
+    <title>Real-Time Election Monitor</title>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <!-- load bootsrap css -->
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.2/chart.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.0/dist/chartjs-plugin-zoom.min.js"></script>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+    <style>
+        .chart-container_1 .header {
+            width: 80%;
+            margin: 25px auto;
+            display: table;
+            border: 1px solid black;
+        }
+
+        .chart-container_1 .header .header-row {
+            display: table-row;
+        }
+
+        .chart-container_1 .header .header-cell {
+            display: table-cell;
+            border: 1px solid black;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .chart-container_2 .box {
+            width: 80%;
+            margin: 25px auto;
+            display: table;
+            border: 1px solid black;
+        }
+
+        .chart-container_2 .box .box-row {
+            display: table-row;
+        }
+
+        .chart-container_2 .box .box-cell {
+            display: table-cell;
+            border: 1px solid black;
+            padding: 10px;
+        }
+
+        label {
+            display: inline-block;
+            width: 150px;
+        }
+
+        .grid1-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            background-color: #333;
+            color: white;
+            position: sticky;
+            top: 0;
+            border: 1px solid black;
+        }
+
+            .grid1-container .menu {
+                grid-column-start: 1;
+                grid-column-end: 5;
+                border: 1px solid black;
+                grid-auto-rows: 50px;
+            }
+
+                .grid1-container .menu a {
+                    float: left;
+                    font-size: 14px;
+                    color: white;
+                    text-align: center;
+                    padding: 14px 16px;
+                    text-decoration: none;
+                }
+
+                    .grid1-container .menu a:hover {
+                        background-color: red;
+                    }
+
+            .grid1-container .box {
+                grid-auto-rows: 40px;
+            }
+
+            .grid1-container .box2 {
+                grid-column-start: 1;
+                grid-column-end: 3;
+                border: 1px solid black;
+            }
+
+            .grid1-container .box3 {
+                grid-column-start: 3;
+                grid-column-end: 5;
+                border: 1px solid black;
+            }
+
+            .grid1-container .box4 {
+                grid-column-start: 1;
+                grid-column-end: 3;
+                border: 1px solid black;
+            }
+
+            .grid1-container .box5 {
+                grid-column-start: 3;
+                grid-column-end: 4;
+                border: 1px solid black;
+            }
+
+            .grid1-container .box6 {
+                grid-column-start: 4;
+                grid-column-end: 5;
+                border: 1px solid black;
+            }
+
+            .grid1-container .box7 {
+                grid-column-start: 1;
+                grid-column-end: 3;
+                border: 1px solid black;
+            }
+
+            .grid1-container .box8 {
+                grid-column-start: 3;
+                grid-column-end: 4;
+                border: 1px solid black;
+            }
+
+            .grid1-container .box9 {
+                grid-column-start: 4;
+                grid-column-end: 5;
+                border: 1px solid black;
+            }
+
+            .grid1-container .box10 {
+                grid-column-start: 1;
+                grid-column-end: 3;
+                border: 1px solid black;
+            }
+
+            .grid1-container .box11 {
+                grid-column-start: 3;
+                grid-column-end: 4;
+                border: 1px solid black;
+            }
+
+            .grid1-container .box12 {
+                grid-column-start: 4;
+                grid-column-end: 5;
+                border: 1px solid black;
+            }
+
+        .table-container_1 {
+            display: table;
+            border: 5px solid black;
+            width: 80%;
+            margin: 25px auto;
+        }
+            .table-container_1 .tc1_row {
+                border: 1px solid black;
+            }
+            .table-container_1 .tc1_cell {
+                border: 1px solid black;
+            }
+            .table-container_1 .tc1_cell_header {
+                border: 5px solid black;
+            }
+    </style>
+</head>
+
+<body>
+    <div class="grid1-container">
+        <div class="menu">
+            <a href="#home">Home</a>
+            <a href="#news">Help</a>
+        </div>
+        <div class="box2">
+            <label>Repository:</label><select id="folder_dropdown"></select>
+            <button type="button" id="btn-folders">Select</button>
+        </div>
+        <div class="box3"><label>Current Timestamp:</label><span id="mytime"></span>[refresh in <span id="myupdate"></span> seconds]</div>
+        <div class="box4">
+            <label>State:</label><select id="states_dropdown"></select>
+            <button type="button" id="btn-states">Select</button>
+        </div>
+        <div class="box5"></div>
+        <div class="box6"></div>
+        <div class="box7">
+            <label>Race:</label><select id="races_dropdown"></select>
+            <button type="button" id="btn-races">Select</button>
+        </div>
+        <div class="box8">
+            <label>Refresh Now:</label>
+            <button type="button" id="btn-refresh-now">Refresh</button>
+        </div>
+        <div class="box9"></div>
+        <div class="box10">
+            <label>Chart Type:</label><select id="chart_type_dropdown"></select>
+            <button type="button" id="btn-charts">Select</button>
+        </div>
+        <div class="box11">
+            <label>Reset Page:</label>
+            <button type="button" id="btn-reset-page">Reset</button>
+        </div>
+        <div class="box12">
+            <label>Screen Updates:</label>
+            <button type="button" id="btn-pause-updates">Pause</button>
+        </div>
+    </div>
+
+    <div id="chart-container_1" , class="chart-container_1">
+        <div class="header">
+            <div class="header-row">
+                <div class="header-cell cell 1">
+                    <canvas id="myCanvas_1">Your browser does not support the canvas feature</canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chart-container_2" , class="chart-container_2">
+    </div>
+
+    <table id="table-container_1" , class="table-container_1">
+        <tr id="tc1_row1" , class="tc1_row">
+            <th id="tc1_cell1" , class="tc1_cell_header">Precinct</th>
+            <th id="tc1_cell2" , class="tc1_cell_header">Candidate</th>
+            <th id="tc1_cell3" , class="tc1_cell_header">Votes</th>
+            <th id="tc1_cell4" , class="tc1_cell_header">Total Votes</th>
+        </tr>
+    </table>
+
+    <script type="text/javascript">
+        const chart_cells = 2;
+        const refresh_rate = 60;
+        var ctx = [];
+        var chart_url = [];
+        var chart_title = [];
+        var chart_type = [];
+        var chart_index = 0;
+        var refresh_counter = refresh_rate;
+        const pass_data = JSON.parse(localStorage.getItem("pass_data"));
+        const num_columns_table_container_1 = 4;
+
+        const base = "http://193.168.100.6:3000/public";
+        const states = ["alabama", "alaska", "arizona", "arkansas", "california", "colorado", "connecticut", "delaware", "florida", "georgia",
+            "hawaii", "idaho", "illinois", "indiana", "iowa", "kansas", "kentucky", "louisiana", "maine", "maryland",
+            "massachusetts", "michigan", "minnesota", "mississippi", "missouri", "montana", "nebraska", "nevada", "new-hampshire", "new-jersey",
+            "new-mexico", "new-york", "north-carolina", "north-dakota", "ohio", "oklahoma", "oregon", "pennsylvania", "rhode-island", "south-carolina",
+            "south-dakota", "tennessee", "texas", "utah", "vermont", "virginia", "washington", "west-virginia", "wisconsin", "wyoming"];
+        const chart_styles = ["line", "bar", "stacked bar"];
+
+        const CHART_COLORS = {
+            red: 'rgb(255, 99, 132)',
+            orange: 'rgb(255, 159, 64)',
+            yellow: 'rgb(255, 205, 86)',
+            green: 'rgb(75, 192, 192)',
+            blue: 'rgb(54, 162, 235)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)'
+        };
+
+        const NAMED_COLORS = [
+            CHART_COLORS.red,
+            CHART_COLORS.orange,
+            CHART_COLORS.yellow,
+            CHART_COLORS.green,
+            CHART_COLORS.blue,
+            CHART_COLORS.purple,
+            CHART_COLORS.grey,
+        ];
+
+        const ColorSchemes_length = NAMED_COLORS.length;
+
+        var APP = APP || {}
+
+        for (i = 0; i < chart_styles.length; i++) {
+            $("#chart_type_dropdown").append('<option value="' + chart_styles[i] + '">' + chart_styles[i] + '</option>');
+        }
+
+        APP.myChart = $("#chart_type_dropdown").prop("selectedIndex", 1).val();
+
+        $.getJSON(`${base}`, {
+
+        }).done(function (data) {
+            for (i = 0; i < data.length; i++) {
+                console.log(data[i]);
+                $("#folder_dropdown").append('<option value="' + data[i] + '">' + data[i] + '</option>');
+            }
+
+            APP.myFolder = data[0];
+
+            $("#folder_dropdown").prop("selectedIndex", 0).val();
+
+            console.log("APP.myFolder: " + `${APP.myFolder}`);
+
+            for (i = 0; i < states.length; i++) {
+                console.log(states[i]);
+                $("#states_dropdown").append('<option value="' + states[i] + '">' + states[i] + '</option>');
+            }
+
+            APP.myState = $("#states_dropdown").prop("selectedIndex", 0).val();
+
+            console.log("APP.myState: " + `${APP.myState}`);
+
+            $.getJSON(`${base}` + '/' + `${APP.myFolder}` + '/alabama/data/', {
+
+            }).done(function (data) {
+                for (i = 0; i < data.length; i++) {
+                    var index = data[i].indexOf(".csv");
+                    if (index > -1) {
+                        console.log(data[i]);
+                        $("#races_dropdown").append('<option value="' + data[i] + '">' + data[i] + '</option>');
+                    }
+                }
+
+                let myData = pass_data[0];
+                myData = myData.split("/");
+                APP.myFolder = myData[4];
+                APP.myState = myData[5];
+                APP.mysel = myData[7];
+                APP.myRace = pass_data[1];
+
+                APP.myBase = `${base}` + '/' + `${APP.myFolder}` + '/' + `${APP.myState}` + '/data';
+
+                $('#folder_dropdown option').each(function () {
+                    if ($(this).val() == APP.myFolder) {
+                        $(this).attr('selected', 'selected');
+                    }
+                });
+
+                $('#states_dropdown option').each(function () {
+                    if ($(this).val() == APP.myState) {
+                        $(this).attr('selected', 'selected');
+                    }
+                });
+
+                $.getJSON(`${base}` + '/' + `${APP.myFolder}` + '/' + `${APP.myState}` + '/data/', {
+
+                }).done(function (data) {
+                    $("#races_dropdown").find('option').remove();
+                    for (i = 0; i < data.length; i++) {
+                        console.log(`${base}` + '/' + `${APP.myFolder}` + '/' + `${APP.myState}` + '/data/' + `${data[i]}`);
+                        console.log(data[i]);
+                        index = data[i].indexOf(".csv");
+                        if (index > -1) {
+                            $("#races_dropdown").append('<option value="' + data[i] + '">' + data[i] + '</option>');
+                        }
+                    }
+
+                    let myselArray = [];
+                    index = APP.myRace.indexOf("timeseries");
+
+                    if (index > -1) {
+                        myData = APP.myRace.split("_");
+                        $('#races_dropdown option').each(function () {
+                            index = $(this).val().indexOf(`${myData[0]}`);
+                            if (index > -1) {
+                                index = $(this).val().indexOf('county');
+                                if (index > -1) {
+                                    console.log($(this).val());
+                                    myselArray.push($(this).val());
+                                }
+                            }
+                        });
+                    }
+
+                    index = APP.myRace.indexOf("overall");
+
+                    if (index > -1) {
+                        myselArray = [];
+                        myData = APP.myRace.split("_");
+                        $('#races_dropdown option').each(function () {
+                            index = $(this).val().indexOf(`${myData[0]}`);
+                            if (index > -1) {
+                                index = $(this).val().indexOf('county');
+                                if (index > -1) {
+                                    console.log($(this).val());
+                                    myselArray.push($(this).val());
+                                }
+                            }
+                        });
+                    }
+
+                    index = APP.myRace.indexOf("county");
+
+                    if (index > -1) {
+                        myselArray = [];
+                        myData = APP.myRace.split("_");
+                        $('#races_dropdown option').each(function () {
+                            index = $(this).val().indexOf(`${myData[0]}`);
+                            if (index > -1) {
+                                index = $(this).val().indexOf('precincts');
+                                if (index > -1) {
+                                    console.log($(this).val());
+                                    myselArray.push($(this).val());
+                                }
+                            }
+                        });
+                    }
+
+                    let mysel = APP.mysel;
+
+                    let myUrl = `${base}` + '/' + `${APP.myFolder}` + '/' + `${APP.myState}` + '/data/' + `${mysel}`;
+
+                    console.log(myUrl);
+
+                    CreateChart(myUrl, APP.mysel);
+
+                    for (i = 0; i < myselArray.length; i++) {
+                        myUrl = `${base}` + '/' + `${APP.myFolder}` + '/' + `${APP.myState}` + '/data/' + `${myselArray[i]}`;
+                        CreateChart(myUrl, myselArray[i]);
+                    }
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            $("#btn-reset-page").click(function () {
+                for (i = 0; i < chart_cells; i++) {
+                    let chartStatus = Chart.getChart(ctx[i]);
+                    if (chartStatus != undefined) {
+                        chartStatus.destroy();
+                    }
+
+                    chart_url[i] = undefined;
+                }
+
+                chart_index = 0;
+            });
+
+            $("#btn-pause-updates").click(function () {
+                console.log($(this).text());
+
+                if ($(this).text() == "Pause") {
+                    $(this).text("Resume");
+                    clearInterval(APP.myIntervalId);
+                    APP.myIntervalId = null;
+                }
+                else {
+                    $(this).text("Pause");
+
+                    if (APP.myIntervalId == null) {
+                        APP.myIntervalId = setInterval(RefreshAndUpdate, 1000);
+                    }
+                }
+            });
+
+            $("#btn-refresh-now").click(function () {
+                refresh_counter = refresh_rate;
+                for (i = 0; i < chart_cells; i++) {
+                    if (chart_url[i] != undefined) {
+                        console.log('RefreshAndUpdate ' + `${chart_title[i]}`);
+                        RefreshChart(chart_url[i], chart_title[i], ctx[i], chart_type[i]);
+                    }
+                }
+            });
+
+            $("#btn-races").click(function () {
+                let mysel = $("#races_dropdown").val();
+                console.log(mysel);
+                let myUrl = `${base}` + '/' + `${APP.myFolder}` + '/' + `${APP.myState}` + '/data/' + `${mysel}`;
+                console.log(myUrl);
+                let chartStatus = Chart.getChart(ctx[chart_index]);
+                if (chartStatus != undefined) {
+                    chartStatus.destroy();
+                }
+
+                if (APP.myChart == 'line') {
+                    var index = mysel.indexOf("timeseries");
+                    if (index > -1) {
+                        let local_str = mysel.split(".");
+                        chart_title[chart_index] = `${local_str[0]}`;
+                        GenerateTimeSeriesChart(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                    }
+
+                    var index = mysel.indexOf("overall");
+                    if (index > -1) {
+                        let local_str = mysel.split(".");
+                        chart_title[chart_index] = `${local_str[0]}`;
+                        GenerateOverallChart(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                    }
+
+                    var index = mysel.indexOf("county");
+                    if (index > -1) {
+                        let local_str = mysel.split(".");
+                        chart_title[chart_index] = `${local_str[0]}`;
+                        GenerateCountyChart(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                    }
+                }
+
+                if (APP.myChart == 'bar') {
+                    var index = mysel.indexOf("timeseries");
+                    if (index > -1) {
+                        let local_str = mysel.split(".");
+                        chart_title[chart_index] = `${local_str[0]}`;
+                        GenerateTimeSeriesChartBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                    }
+
+                    var index = mysel.indexOf("overall");
+                    if (index > -1) {
+                        let local_str = mysel.split(".");
+                        chart_title[chart_index] = `${local_str[0]}`;
+                        GenerateOverallChartBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                    }
+
+                    var index = mysel.indexOf("county");
+                    if (index > -1) {
+                        let local_str = mysel.split(".");
+                        chart_title[chart_index] = `${local_str[0]}`;
+                        GenerateCountyChartBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                    }
+                }
+
+                if (APP.myChart == 'stacked bar') {
+                    var index = mysel.indexOf("timeseries");
+                    if (index > -1) {
+                        let local_str = mysel.split(".");
+                        chart_title[chart_index] = `${local_str[0]}`;
+                        GenerateTimeSeriesChartStackedBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                    }
+
+                    var index = mysel.indexOf("overall");
+                    if (index > -1) {
+                        let local_str = mysel.split(".");
+                        chart_title[chart_index] = `${local_str[0]}`;
+                        GenerateOverallChartStackedBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                    }
+
+                    var index = mysel.indexOf("county");
+                    if (index > -1) {
+                        let local_str = mysel.split(".");
+                        chart_title[chart_index] = `${local_str[0]}`;
+                        GenerateCountyChartStackedBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                    }
+                }
+
+                chart_url[chart_index] = myUrl;
+
+                if (chart_index < chart_cells) {
+                    chart_index = chart_index + 1;
+                }
+                else {
+                    chart_index = 0;
+                }
+            });
+
+            $("#btn-folders").click(function () {
+                $("#races_dropdown").find('option').remove();
+                APP.myFolder = $("#folder_dropdown").val();
+                console.log("APP.myFolder: " + `${APP.myFolder}`);
+
+                $.getJSON(`${base}` + '/' + `${APP.myFolder}` + '/' + `${APP.myState}` + '/data/', {
+
+                }).done(function (data) {
+                    for (i = 0; i < data.length; i++) {
+                        console.log(`${base}` + '/' + `${APP.myFolder}` + '/' + `${APP.myState}` + '/data/' + `${data[i]}`);
+                        var index = data[i].indexOf(".csv");
+                        if (index > -1) {
+                            console.log(data[i]);
+                            $("#races_dropdown").append('<option value="' + data[i] + '">' + data[i] + '</option>');
+                        }
+                    }
+                });
+            });
+
+            $("#btn-charts").click(function () {
+                APP.myChart = $("#chart_type_dropdown").val();
+                console.log("APP.myChart: " + `${APP.myChart}`);
+            });
+
+            $("#btn-states").click(function () {
+                $("#races_dropdown").find('option').remove();
+                APP.myState = $("#states_dropdown").val();
+                console.log("APP.myState: " + `${APP.myState}`);
+                console.log(`${base}` + '/' + `${APP.myFolder}` + '/' + `${APP.myState}` + '/data/');
+
+                $.getJSON(`${base}` + '/' + `${APP.myFolder}` + '/' + `${APP.myState}` + '/data/', {
+
+                }).done(function (data) {
+                    for (i = 0; i < data.length; i++) {
+                        console.log(`${base}` + '/' + `${APP.myFolder}` + '/' + `${APP.myState}` + '/data/' + `${data[i]}`);
+                        console.log(data[i]);
+                        var index = data[i].indexOf(".csv");
+                        if (index > -1) {
+                            $("#races_dropdown").append('<option value="' + data[i] + '">' + data[i] + '</option>');
+                        }
+                    }
+                });
+            });
+
+            $("canvas").dblclick(function () {
+                myctx = this.getContext("2d");
+                for (i = 0; i < chart_cells; i++) {
+                    if (myctx == ctx[i]) {
+                        if (typeof (chart_url[i]) === 'undefined') {
+
+                        }
+                        else {
+                            console.log('match ' + `${ctx[i]}` + ' ' + `${chart_title[i]}` + ' ' + `${chart_url[i]}` + ' ' + `${typeof (chart_url[i])}`);
+                            let vartemp = [chart_url[i], chart_title[i], ctx[i]];
+                            localStorage.setItem("pass_data", JSON.stringify(vartemp));
+                            window.open("details");
+                        }
+                    }
+                }
+            });
+
+            $('#chart-container_2').append(
+                $('<div>').prop({
+                    id: '_box',
+                    className: 'box'
+                })
+            );
+
+            for (i = 1; i < chart_cells; i++) {
+                let myId = '_box-row-' + `${i}`;
+                $('#_box').append(
+                    $('<div>').prop({
+                        id: myId,
+                        className: 'box-row'
+                    })
+                );
+            }
+
+            let cell_counter = 2;
+
+            for (i = 1; i < chart_cells; i++) {
+                for (let j = 0; j < 1; j++) {
+                    let myId = 'box-cell box ' + `${cell_counter}`;
+                    let myString = '<canvas id=myCanvas_' + `${cell_counter}` + '>' + 'Your browser does not support the canvas feature.</canvas>';
+                    $('#_box-row-' + `${i}`).append(
+                        $('<div>').prop({
+                            innerHTML: myString,
+                            className: myId
+                        })
+                    );
+                    cell_counter++;
+                }
+            }
+
+            for (i = 0; i < chart_cells; i++) {
+
+                ctx[i] = document.getElementById('myCanvas_' + `${i + 1}`).getContext("2d");
+            }
+        });
+
+        function GenerateTimeSeriesChartBar(url, myTitle, ctx) {
+            d3.csv(`${url}`).then(function (d) {
+
+                var candidates = d.map(function (d) { return d.CANDIDATE });
+
+                var unique_candidates = d3.set(candidates).values();
+
+                var data_array = {};
+                var votes_array = {};
+                var votes_calculated = {};
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    data_array[i] = d.filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    data_array[i] = data_array[i].sort(function (a, b) {
+                        return d3.ascending(a.Timestamp, b.Timestamp);
+                    });
+
+                    votes_array[i] = data_array[i].map(function (x) { return x.VOTES });
+
+                    votes_calculated[i] = data_array[i].map(function (x) { return x.VOTE_SHARES });
+
+                    for (j = 0; j < votes_calculated[i].length; j++) {
+                        votes_calculated[i][j] = Number(votes_calculated[i][j]) * Number(votes_array[i][j]);
+                    }
+                }
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    var timestamps = data_array[i].map(function (x) { return x.Timestamp });
+                }
+
+                const genericOptions = {
+                    fill: false,
+                    interaction: {
+                        intersect: false
+                    },
+                    radius: 1,
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${myTitle}`
+                        },
+                        zoom: {
+                            zoom: {
+                                drag: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    }
+                };
+
+                line_chart = {};
+                line_chart.label = [];
+                line_chart.datasets = [];
+                line_chart.labels = timestamps;
+
+                let myColor = 0;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    dataset = {};
+                    dataset.label = unique_candidates[i];
+                    dataset.data = votes_calculated[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+                }
+
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+
+                    data: line_chart,
+
+                    options: genericOptions,
+                });
+
+                APP.timeseries_data = line_chart;
+
+            });
+        }
+
+        function GenerateTimeSeriesChartStackedBar(url, myTitle, ctx) {
+            d3.csv(`${url}`).then(function (d) {
+
+                var candidates = d.map(function (d) { return d.CANDIDATE });
+
+                var unique_candidates = d3.set(candidates).values();
+
+                var data_array = {};
+                var votes_array = {};
+                var votes_calculated = {};
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    data_array[i] = d.filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    data_array[i] = data_array[i].sort(function (a, b) {
+                        return d3.ascending(a.Timestamp, b.Timestamp);;
+                    });
+
+                    votes_array[i] = data_array[i].map(function (x) { return x.VOTES });
+
+                    votes_calculated[i] = data_array[i].map(function (x) { return x.VOTE_SHARES });
+
+                    for (j = 0; j < votes_calculated[i].length; j++) {
+                        votes_calculated[i][j] = Number(votes_calculated[i][j]) * Number(votes_array[i][j]);
+                    }
+                }
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    var timestamps = data_array[i].map(function (x) { return x.Timestamp });
+                }
+
+                const genericOptions = {
+                    fill: false,
+                    interaction: {
+                        intersect: false
+                    },
+                    radius: 1,
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${myTitle}`
+                        },
+                        zoom: {
+                            zoom: {
+                                drag: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    }
+                };
+
+                line_chart = {};
+                line_chart.label = [];
+                line_chart.datasets = [];
+                line_chart.labels = timestamps;
+
+                let myColor = 0;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    dataset = {};
+                    dataset.label = unique_candidates[i];
+                    dataset.data = votes_calculated[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+                }
+
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+
+                    data: line_chart,
+
+                    options: genericOptions,
+                });
+
+                APP.timeseries_data = line_chart;
+
+            });
+        }
+
+        function GenerateTimeSeriesChart(url, myTitle, ctx) {
+            d3.csv(`${url}`).then(function (d) {
+
+                var candidates = d.map(function (d) { return d.CANDIDATE });
+
+                var unique_candidates = d3.set(candidates).values();
+
+                var data_array = {};
+                var votes_array = {};
+                var votes_calculated = {};
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    data_array[i] = d.filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    data_array[i] = data_array[i].sort(function (a, b) {
+                        return d3.ascending(a.Timestamp, b.Timestamp);
+                    });
+
+                    votes_array[i] = data_array[i].map(function (x) { return x.VOTES });
+
+                    votes_calculated[i] = data_array[i].map(function (x) { return x.VOTE_SHARES });
+
+                    for (j = 0; j < votes_calculated[i].length; j++) {
+                        votes_calculated[i][j] = Number(votes_calculated[i][j]) * Number(votes_array[i][j]);
+                    }
+                }
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    var timestamps = data_array[i].map(function (x) { return x.Timestamp });
+                }
+
+                const genericOptions = {
+                    fill: false,
+                    interaction: {
+                        intersect: false
+                    },
+                    radius: 1,
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${myTitle}`
+                        },
+                        zoom: {
+                            zoom: {
+                                drag: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    }
+                };
+
+                line_chart = {};
+                line_chart.label = [];
+                line_chart.datasets = [];
+                line_chart.labels = timestamps;
+
+                let myColor = 0;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    dataset = {};
+                    dataset.label = unique_candidates[i];
+                    dataset.data = votes_calculated[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+                }
+
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+
+                    data: line_chart,
+
+                    options: genericOptions,
+                });
+
+                APP.timeseries_data = line_chart;
+
+            });
+        }
+
+        function GenerateOverallChart(url, myTitle, ctx) {
+            d3.csv(`${url}`).then(function (d) {
+
+                var candidates = d.map(function (d) { return d.CANDIDATE });
+
+                var unique_candidates = d3.set(candidates).values();
+
+                var data_array = {};
+                var votes_array = {};
+                var abs_votes_array = {};
+                var electoral_votes_array = {};
+                var votes_calculated = {};
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    data_array[i] = d.filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    data_array[i] = data_array[i].sort(function (a, b) {
+                        return d3.ascending(a.Timestamp, b.Timestamp);
+                    });
+
+                    votes_array[i] = data_array[i].map(function (x) { return x.VOTES });
+
+                    abs_votes_array[i] = data_array[i].map(function (x) { return x.ABS_VOTES });
+
+                    electoral_votes_array[i] = data_array[i].map(function (x) { return x.ELECTORAL_VOTES });
+                }
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    var timestamps = data_array[i].map(function (x) { return x.Timestamp });
+                }
+
+                const genericOptions = {
+                    fill: false,
+                    interaction: {
+                        intersect: false
+                    },
+                    radius: 1,
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${myTitle}`
+                        },
+                        zoom: {
+                            zoom: {
+                                drag: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    }
+                };
+
+                line_chart = {};
+                line_chart.label = [];
+                line_chart.datasets = [];
+                line_chart.labels = timestamps;
+
+                let myColor = 0;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_votes';
+                    dataset.data = votes_array[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_abs_votes';
+                    dataset.data = abs_votes_array[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_electoral_votes';
+                    dataset.data = electoral_votes_array[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+                }
+
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+
+                    data: line_chart,
+
+                    options: genericOptions,
+                });
+
+                APP.overall_data = line_chart;
+
+            });
+        }
+
+        function GeneratePrecinctsChartBar(url, myTitle, ctx) {
+            d3.csv(`${url}`).then(function (d) {
+
+                var timestamps = d.map(function (d) { return d.Timestamp });
+
+                var unique_timestamps = d3.set(timestamps).values();
+
+                unique_timestamps = unique_timestamps.sort(function (a, b) {
+                    return d3.descending(a, b);
+                });
+
+                APP.unique_timestamps = unique_timestamps;
+
+                var candidates = d.map(function (d) { return d.CANDIDATE });
+
+                var unique_candidates = d3.set(candidates).values();
+
+                var data_array = {};
+                var data_array_county = {};
+                var data_array_precincts = {};
+                var votes_array = {};
+                var total_votes_array = {};
+                var precincts_candidate_array = {};
+
+                let tempvar = APP.mysel.split('_');
+                let myCounty = '';
+                for (i = 1; i < (tempvar.length - 1); i++) {
+                    myCounty = myCounty + `${tempvar[i]}`;
+                    if (i < (tempvar.length - 2)) {
+                        myCounty = myCounty + '_';
+                    }
+                }
+                APP.myCounty = myCounty;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    data_array[i] = d.filter(function (d) {
+                        if ((d.CANDIDATE == unique_candidates[i]) && (d.Timestamp == unique_timestamps[0])) {
+                            return d;
+                        }
+                    });
+
+                    data_array_county[i] = d.filter(function (d) {
+                        console.log(d.COUNTY);
+                        if ((d.COUNTY.includes(myCounty)) && (d.Timestamp == unique_timestamps[0])) {
+                            return d;
+                        }
+                    });
+
+                    data_array_precincts[i] = data_array_county[i].map(function (x) { return x.PRECINCT });
+
+                    data_array_precincts[i] = data_array_precincts[i].sort(function (a, b) {
+                        return d3.ascending(a, b);
+                    });
+
+                    var timestamps = d3.set(data_array_precincts[i]).values();
+
+                    votes_array[i] = data_array_county[i].filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    votes_array[i] = votes_array[i].sort(function (a, b) {
+                        return d3.ascending(a.PRECINCT, b.PRECINCT);
+                    });
+
+                    precincts_candidate_array[i] = votes_array[i];
+
+                    votes_array[i] = votes_array[i].map(function (x) { return x.VOTES });
+
+                    total_votes_array[i] = data_array_county[i].filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    total_votes_array[i] = total_votes_array[i].sort(function (a, b) {
+                        return d3.ascending(a.PRECINCT, b.PRECINCT);
+                    });
+
+                    total_votes_array[i] = total_votes_array[i].map(function (x) { return x.TOTAL_VOTES });
+                }
+
+                APP.precincts_candidate_array = precincts_candidate_array;
+                APP.data_array_county = data_array_county;
+                APP.data_array = data_array;
+
+                let local_title = `${myCounty}` + '_' + `${myTitle}`;
+
+                const genericOptions = {
+                    fill: false,
+                    interaction: {
+                        intersect: false
+                    },
+                    radius: 1,
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${local_title}`
+                        },
+                        zoom: {
+                            zoom: {
+                                drag: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    }
+                };
+
+                line_chart = {};
+                line_chart.label = [];
+                line_chart.datasets = [];
+                line_chart.labels = timestamps;
+
+                let myColor = 0;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_votes';
+                    dataset.data = votes_array[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+                }
+
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+
+                    data: line_chart,
+
+                    options: genericOptions,
+                });
+
+                //<table id="table-container_1", class="table-container_1">
+                //    <tr id="tc1_row1", class="tc1_row">
+                //    <th id="tc1_cell1", class="tc1_cell">Precinct</th>
+                //    <th id="tc1_cell2", class="tc1_cell">Candidate</th>
+                //    <th id="tc1_cell3", class="tc1_cell">Votes</th>
+                //    <th id="tc1_cell4", class="tc1_cell">Total Votes</th>
+                //    </tr >
+                //</table >
+
+                //delete table first
+                $("#table-container_1 tr").slice(1).remove();
+
+                let row_counter = 2;
+                let myId;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    for (let j = 0; j < precincts_candidate_array[i].length; j++) {
+                        myId = 'tc1_row' + `${row_counter}`;
+                        $('#table-container_1').append(
+                            $('<tr>').prop({
+                                id: myId,
+                                className: 'tc1_row'
+                            })
+                        );
+                        row_counter++;
+                    }
+                }
+
+                row_counter = 2;
+                let cell_counter = 5;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    for (let j = 0; j < precincts_candidate_array[i].length; j++) {
+                        for (let k = 0; k < 4; k++) {
+                            myId = 'tc1_cell' + `${cell_counter}`;
+                            $('#tc1_row' + `${row_counter}`).append(
+                                $('<td>').prop({
+                                    id: myId,
+                                    className: 'tc1_cell'
+                                })
+                            );
+                            cell_counter++;
+                        }
+                        row_counter++;
+                    }
+                }
+
+                let base_cell_counter = 5;
+
+                cell_counter = 5;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+
+                    for (let j = 0; j < precincts_candidate_array[i].length; j++) {
+                        $('#tc1_cell' + `${cell_counter}`).append(
+                            $('<td>').prop({
+                                innerHTML: precincts_candidate_array[i][j].PRECINCT
+                            })
+                        );
+                        $('#tc1_cell' + `${cell_counter + 1}`).append(
+                            $('<td>').prop({
+                                innerHTML: precincts_candidate_array[i][j].CANDIDATE
+                            })
+                        );
+                        $('#tc1_cell' + `${cell_counter + 2}`).append(
+                            $('<td>').prop({
+                                innerHTML: precincts_candidate_array[i][j].VOTES
+                            })
+                        );
+                        $('#tc1_cell' + `${cell_counter + 3}`).append(
+                            $('<td>').prop({
+                                innerHTML: precincts_candidate_array[i][j].TOTAL_VOTES
+                            })
+                        );
+
+                        cell_counter = cell_counter + (unique_candidates.length * num_columns_table_container_1);
+                    }
+
+                    base_cell_counter += num_columns_table_container_1;
+                    cell_counter = base_cell_counter;
+                }
+
+                APP.overall_data = line_chart;
+            });
+        }
+
+        function GeneratePrecinctsChartStackedBar(url, myTitle, ctx) {
+            d3.csv(`${url}`).then(function (d) {
+
+                var timestamps = d.map(function (d) { return d.Timestamp });
+
+                var unique_timestamps = d3.set(timestamps).values();
+
+                unique_timestamps = unique_timestamps.sort(function (a, b) {
+                    return d3.descending(a, b);
+                });
+
+                APP.unique_timestamps = unique_timestamps;
+
+                var candidates = d.map(function (d) { return d.CANDIDATE });
+
+                var unique_candidates = d3.set(candidates).values();
+
+                var data_array = {};
+                var data_array_county = {};
+                var data_array_precincts = {};
+                var votes_array = {};
+                var total_votes_array = {};
+                var precincts_candidate_array = {};
+
+                let tempvar = APP.mysel.split('_');
+                let myCounty = '';
+                for (i = 1; i < (tempvar.length - 1); i++) {
+                    myCounty = myCounty + `${tempvar[i]}`;
+                    if (i < (tempvar.length - 2)) {
+                        myCounty = myCounty + '_';
+                    }
+                }
+                APP.myCounty = myCounty;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    data_array[i] = d.filter(function (d) {
+                        if ((d.CANDIDATE == unique_candidates[i]) && (d.Timestamp == unique_timestamps[0])) {
+                            return d;
+                        }
+                    });
+
+                    data_array_county[i] = d.filter(function (d) {
+                        if ((d.COUNTY == myCounty) && (d.Timestamp == unique_timestamps[0])) {
+                            return d;
+                        }
+                    });
+
+                    data_array_precincts[i] = data_array_county[i].map(function (x) { return x.PRECINCT });
+
+                    data_array_precincts[i] = data_array_precincts[i].sort(function (a, b) {
+                        return d3.ascending(a, b);
+                    });
+
+                    var timestamps = d3.set(data_array_precincts[i]).values();
+
+                    votes_array[i] = data_array_county[i].filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    votes_array[i] = votes_array[i].sort(function (a, b) {
+                        return d3.ascending(a.PRECINCT, b.PRECINCT);
+                    });
+
+                    precincts_candidate_array[i] = votes_array[i];
+
+                    votes_array[i] = votes_array[i].map(function (x) { return x.VOTES });
+
+                    total_votes_array[i] = data_array_county[i].filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    total_votes_array[i] = total_votes_array[i].sort(function (a, b) {
+                        return d3.ascending(a.PRECINCT, b.PRECINCT);
+                    });
+
+                    total_votes_array[i] = total_votes_array[i].map(function (x) { return x.TOTAL_VOTES });
+                }
+                APP.precincts_candidate_array = precincts_candidate_array;
+                let local_title = `${myCounty}` + '_' + `${myTitle}`;
+
+                const genericOptions = {
+                    fill: false,
+                    interaction: {
+                        intersect: false
+                    },
+                    radius: 1,
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${local_title}`
+                        },
+                        zoom: {
+                            zoom: {
+                                drag: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    }
+                };
+
+                line_chart = {};
+                line_chart.label = [];
+                line_chart.datasets = [];
+                line_chart.labels = timestamps;
+
+                let myColor = 0;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_votes';
+                    dataset.data = votes_array[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+                }
+
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+
+                    data: line_chart,
+
+                    options: genericOptions,
+                });
+
+                //<table id="table-container_1", class="table-container_1">
+                //    <tr id="tc1_row1", class="tc1_row">
+                //    <th id="tc1_cell1", class="tc1_cell">Precinct</th>
+                //    <th id="tc1_cell2", class="tc1_cell">Candidate</th>
+                //    <th id="tc1_cell3", class="tc1_cell">Votes</th>
+                //    <th id="tc1_cell4", class="tc1_cell">Total Votes</th>
+                //    </tr >
+                //</table >
+
+                //delete table first
+                $("#table-container_1 tr").slice(1).remove();
+
+                let row_counter = 2;
+                let myId;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    for (let j = 0; j < precincts_candidate_array[i].length; j++) {
+                        myId = 'tc1_row' + `${row_counter}`;
+                        $('#table-container_1').append(
+                            $('<tr>').prop({
+                                id: myId,
+                                className: 'tc1_row'
+                            })
+                        );
+                        row_counter++;
+                    }
+                }
+
+                row_counter = 2;
+                let cell_counter = 5;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    for (let j = 0; j < precincts_candidate_array[i].length; j++) {
+                        for (let k = 0; k < 4; k++) {
+                            myId = 'tc1_cell' + `${cell_counter}`;
+                            $('#tc1_row' + `${row_counter}`).append(
+                                $('<td>').prop({
+                                    id: myId,
+                                    className: 'tc1_cell'
+                                })
+                            );
+                            cell_counter++;
+                        }
+                        row_counter++;
+                    }
+                }
+
+                let base_cell_counter = 5;
+
+                cell_counter = 5;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+
+                    for (let j = 0; j < precincts_candidate_array[i].length; j++) {
+                        $('#tc1_cell' + `${cell_counter}`).append(
+                            $('<td>').prop({
+                                innerHTML: precincts_candidate_array[i][j].PRECINCT
+                            })
+                        );
+                        $('#tc1_cell' + `${cell_counter + 1}`).append(
+                            $('<td>').prop({
+                                innerHTML: precincts_candidate_array[i][j].CANDIDATE
+                            })
+                        );
+                        $('#tc1_cell' + `${cell_counter + 2}`).append(
+                            $('<td>').prop({
+                                innerHTML: precincts_candidate_array[i][j].VOTES
+                            })
+                        );
+                        $('#tc1_cell' + `${cell_counter + 3}`).append(
+                            $('<td>').prop({
+                                innerHTML: precincts_candidate_array[i][j].TOTAL_VOTES
+                            })
+                        );
+
+                        cell_counter = cell_counter + (unique_candidates.length * num_columns_table_container_1);
+                    }
+
+                    base_cell_counter += num_columns_table_container_1;
+                    cell_counter = base_cell_counter;
+                }
+
+                APP.overall_data = line_chart;
+            });
+        }
+
+        function GenerateOverallChartBar(url, myTitle, ctx) {
+            d3.csv(`${url}`).then(function (d) {
+
+                var candidates = d.map(function (d) { return d.CANDIDATE });
+
+                var unique_candidates = d3.set(candidates).values();
+
+                var data_array = {};
+                var votes_array = {};
+                var abs_votes_array = {};
+                var electoral_votes_array = {};
+                var votes_calculated = {};
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    data_array[i] = d.filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    data_array[i] = data_array[i].sort(function (a, b) {
+                        return d3.ascending(a.Timestamp, b.Timestamp);
+                    });
+
+                    votes_array[i] = data_array[i].map(function (x) { return x.VOTES });
+
+                    abs_votes_array[i] = data_array[i].map(function (x) { return x.ABS_VOTES });
+
+                    electoral_votes_array[i] = data_array[i].map(function (x) { return x.ELECTORAL_VOTES });
+                }
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    var timestamps = data_array[i].map(function (x) { return x.Timestamp });
+                }
+
+                const genericOptions = {
+                    fill: false,
+                    interaction: {
+                        intersect: false
+                    },
+                    radius: 1,
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${myTitle}`
+                        },
+                        zoom: {
+                            zoom: {
+                                drag: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    }
+                };
+
+                line_chart = {};
+                line_chart.label = [];
+                line_chart.datasets = [];
+                line_chart.labels = timestamps;
+
+                let myColor = 0;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_votes';
+                    dataset.data = votes_array[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_abs_votes';
+                    dataset.data = abs_votes_array[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_electoral_votes';
+                    dataset.data = electoral_votes_array[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+                }
+
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+
+                    data: line_chart,
+
+                    options: genericOptions,
+                });
+
+                APP.overall_data = line_chart;
+
+            });
+        }
+
+        function GenerateOverallChartStackedBar(url, myTitle, ctx) {
+            d3.csv(`${url}`).then(function (d) {
+
+                var candidates = d.map(function (d) { return d.CANDIDATE });
+
+                var unique_candidates = d3.set(candidates).values();
+
+                var data_array = {};
+                var votes_array = {};
+                var abs_votes_array = {};
+                var electoral_votes_array = {};
+                var votes_calculated = {};
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    data_array[i] = d.filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    data_array[i] = data_array[i].sort(function (a, b) {
+                        return d3.ascending(a.Timestamp, b.Timestamp);
+                    });
+
+                    votes_array[i] = data_array[i].map(function (x) { return x.VOTES });
+
+                    abs_votes_array[i] = data_array[i].map(function (x) { return x.ABS_VOTES });
+
+                    electoral_votes_array[i] = data_array[i].map(function (x) { return x.ELECTORAL_VOTES });
+                }
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    var timestamps = data_array[i].map(function (x) { return x.Timestamp });
+                }
+
+                const genericOptions = {
+                    fill: false,
+                    interaction: {
+                        intersect: false
+                    },
+                    radius: 1,
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${myTitle}`
+                        },
+                        zoom: {
+                            zoom: {
+                                drag: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    }
+                };
+
+                line_chart = {};
+                line_chart.label = [];
+                line_chart.datasets = [];
+                line_chart.labels = timestamps;
+
+                let myColor = 0;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_votes';
+                    dataset.data = votes_array[i];
+                    dataset.stack = "votes";
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_abs_votes';
+                    dataset.data = abs_votes_array[i];
+                    dataset.stack = "abs_votes";
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_electoral_votes';
+                    dataset.data = electoral_votes_array[i];
+                    dataset.stack = "abs_votes";
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+                }
+
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+
+                    data: line_chart,
+
+                    options: genericOptions,
+                });
+
+                APP.overall_data = line_chart;
+
+            });
+        }
+
+        function GenerateCountyChart(url, myTitle, ctx) {
+            d3.csv(`${url}`).then(function (d) {
+
+                var candidates = d.map(function (d) { return d.CANDIDATE });
+
+                var unique_candidates = d3.set(candidates).values();
+
+                var data_array = {};
+                var votes_array = {};
+                var abs_votes_array = {};
+                var reporting_precincts_array = {};
+                var total_precincts_array = {};
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    data_array[i] = d.filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    data_array[i] = data_array[i].sort(function (a, b) {
+                        return d3.ascending(a.Timestamp, b.Timestamp);
+                    });
+
+                    votes_array[i] = data_array[i].map(function (x) { return x.VOTES });
+
+                    abs_votes_array[i] = data_array[i].map(function (x) { return x.ABS_VOTES });
+
+                    reporting_precincts_array[i] = data_array[i].map(function (x) { return x.REPORTING });
+
+                    total_precincts_array[i] = data_array[i].map(function (x) { return x.PRECINCTS });
+                }
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    var timestamps = data_array[i].map(function (x) { return x.Timestamp });
+                }
+
+                const genericOptions = {
+                    fill: false,
+                    interaction: {
+                        intersect: false
+                    },
+                    radius: 1,
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${myTitle}`
+                        },
+                        zoom: {
+                            zoom: {
+                                drag: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        A: {
+                            type: 'linear',
+                            position: 'left',
+                        },
+                        B: {
+                            type: 'linear',
+                            position: 'right',
+                        },
+                    },
+                };
+
+                line_chart = {};
+                line_chart.label = [];
+                line_chart.datasets = [];
+                line_chart.labels = timestamps;
+
+                let myColor = 0;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_votes';
+                    dataset.yAxisID = 'A';
+                    dataset.data = votes_array[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_abs_votes';
+                    dataset.data = abs_votes_array[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+                }
+
+                dataset = {};
+                dataset.label = 'precincts_reporting';
+                dataset.yAxisID = 'B';
+                dataset.data = reporting_precincts_array[0];
+
+                if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                dataset.backgroundColor = NAMED_COLORS[myColor];
+                dataset.borderColor = NAMED_COLORS[myColor];
+
+                line_chart.datasets.push(dataset);
+
+                dataset = {};
+                dataset.label = 'total_precincts';
+                dataset.yAxisID = 'B';
+                dataset.data = total_precincts_array[0];
+
+                if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                dataset.backgroundColor = NAMED_COLORS[myColor];
+                dataset.borderColor = NAMED_COLORS[myColor];
+
+                line_chart.datasets.push(dataset);
+
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+
+                    data: line_chart,
+
+                    options: genericOptions,
+                });
+
+                APP.county_data = line_chart;
+
+            });
+        }
+
+        function GenerateCountyChartBar(url, myTitle, ctx) {
+            d3.csv(`${url}`).then(function (d) {
+
+                var candidates = d.map(function (d) { return d.CANDIDATE });
+
+                var unique_candidates = d3.set(candidates).values();
+
+                var data_array = {};
+                var votes_array = {};
+                var abs_votes_array = {};
+                var reporting_precincts_array = {};
+                var total_precincts_array = {};
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    data_array[i] = d.filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    data_array[i] = data_array[i].sort(function (a, b) {
+                        return d3.ascending(a.Timestamp, b.Timestamp);
+                    });
+
+                    votes_array[i] = data_array[i].map(function (x) { return x.VOTES });
+
+                    abs_votes_array[i] = data_array[i].map(function (x) { return x.ABS_VOTES });
+
+                    reporting_precincts_array[i] = data_array[i].map(function (x) { return x.REPORTING });
+
+                    total_precincts_array[i] = data_array[i].map(function (x) { return x.PRECINCTS });
+                }
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    var timestamps = data_array[i].map(function (x) { return x.Timestamp });
+                }
+
+                const genericOptions = {
+                    fill: false,
+                    interaction: {
+                        intersect: false
+                    },
+                    radius: 1,
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${myTitle}`
+                        },
+                        zoom: {
+                            zoom: {
+                                drag: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        A: {
+                            type: 'linear',
+                            position: 'left',
+                        },
+                        B: {
+                            type: 'linear',
+                            position: 'right',
+                        },
+                    },
+                };
+
+                line_chart = {};
+                line_chart.label = [];
+                line_chart.datasets = [];
+                line_chart.labels = timestamps;
+
+                let myColor = 0;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_votes';
+                    dataset.yAxisID = 'A';
+                    dataset.data = votes_array[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_abs_votes';
+                    dataset.data = abs_votes_array[i];
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+                }
+
+                dataset = {};
+                dataset.label = 'precincts_reporting';
+                dataset.yAxisID = 'B';
+                dataset.type = 'line';
+                dataset.data = reporting_precincts_array[0];
+
+                if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                dataset.backgroundColor = NAMED_COLORS[myColor];
+                dataset.borderColor = NAMED_COLORS[myColor];
+
+                line_chart.datasets.push(dataset);
+
+                dataset = {};
+                dataset.label = 'total_precincts';
+                dataset.yAxisID = 'B';
+                dataset.type = 'line';
+                dataset.data = total_precincts_array[0];
+
+                if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                dataset.backgroundColor = NAMED_COLORS[myColor];
+                dataset.borderColor = NAMED_COLORS[myColor];
+
+                line_chart.datasets.push(dataset);
+
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+
+                    data: line_chart,
+
+                    options: genericOptions,
+                });
+
+                APP.county_data = line_chart;
+
+            });
+        }
+
+        function GenerateCountyChartStackedBar(url, myTitle, ctx) {
+            d3.csv(`${url}`).then(function (d) {
+
+                var candidates = d.map(function (d) { return d.CANDIDATE });
+
+                var unique_candidates = d3.set(candidates).values();
+
+                var data_array = {};
+                var votes_array = {};
+                var abs_votes_array = {};
+                var reporting_precincts_array = {};
+                var total_precincts_array = {};
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    data_array[i] = d.filter(function (d) {
+                        if (d.CANDIDATE == unique_candidates[i]) {
+                            return d;
+                        }
+                    });
+
+                    data_array[i] = data_array[i].sort(function (a, b) {
+                        return d3.ascending(a.Timestamp, b.Timestamp);
+                    });
+
+                    votes_array[i] = data_array[i].map(function (x) { return x.VOTES });
+
+                    abs_votes_array[i] = data_array[i].map(function (x) { return x.ABS_VOTES });
+
+                    reporting_precincts_array[i] = data_array[i].map(function (x) { return x.REPORTING });
+
+                    total_precincts_array[i] = data_array[i].map(function (x) { return x.PRECINCTS });
+                }
+
+                for (i = 0; i < unique_candidates.length; i++) {
+                    var timestamps = data_array[i].map(function (x) { return x.Timestamp });
+                }
+
+                const genericOptions = {
+                    fill: false,
+                    interaction: {
+                        intersect: false
+                    },
+                    radius: 1,
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${myTitle}`
+                        },
+                        zoom: {
+                            zoom: {
+                                drag: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        A: {
+                            type: 'linear',
+                            position: 'left',
+                            stacked: true,
+                        },
+                        B: {
+                            type: 'linear',
+                            position: 'right',
+                            /*stacked: true,*/
+                        },
+                    },
+                };
+
+                line_chart = {};
+                line_chart.label = [];
+                line_chart.datasets = [];
+                line_chart.labels = timestamps;
+
+                let myColor = 0;
+
+                for (i = 0; i < unique_candidates.length; i++) {
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_votes';
+                    dataset.yAxisID = 'A';
+                    dataset.data = votes_array[i];
+                    dataset.stack = "votes";
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+
+                    dataset = {};
+                    dataset.label = `${unique_candidates[i]}` + '_abs_votes';
+                    dataset.data = abs_votes_array[i];
+                    dataset.stack = "abs_votes";
+
+                    if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                    dataset.backgroundColor = NAMED_COLORS[myColor];
+                    dataset.borderColor = NAMED_COLORS[myColor];
+
+                    line_chart.datasets.push(dataset);
+
+                    myColor++;
+                }
+
+                dataset = {};
+                dataset.label = 'precincts_reporting';
+                dataset.yAxisID = 'B';
+                dataset.type = 'line';
+                dataset.data = reporting_precincts_array[0];
+
+                if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                dataset.backgroundColor = NAMED_COLORS[myColor];
+                dataset.borderColor = NAMED_COLORS[myColor];
+
+                line_chart.datasets.push(dataset);
+
+                dataset = {};
+                dataset.label = 'total_precincts';
+                dataset.yAxisID = 'B';
+                dataset.type = 'line';
+                dataset.data = total_precincts_array[0];
+
+                if (myColor > ColorSchemes_length) { myColor = 0 };
+
+                dataset.backgroundColor = NAMED_COLORS[myColor];
+                dataset.borderColor = NAMED_COLORS[myColor];
+
+                line_chart.datasets.push(dataset);
+
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+
+                    data: line_chart,
+
+                    options: genericOptions,
+                });
+
+                APP.county_data = line_chart;
+
+            });
+        }
+
+        function CreateChart(myUrl, mysel) {
+
+            let chartStatus = Chart.getChart(ctx[chart_index]);
+            if (chartStatus != undefined) {
+                chartStatus.destroy();
+            }
+
+            if (APP.myChart == 'line') {
+                index = mysel.indexOf("timeseries");
+                if (index > -1) {
+                    let local_str = mysel.split(".");
+                    chart_title[chart_index] = `${local_str[0]}`;
+                    GenerateTimeSeriesChart(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                }
+
+                index = mysel.indexOf("overall");
+                if (index > -1) {
+                    let local_str = mysel.split(".");
+                    chart_title[chart_index] = `${local_str[0]}`;
+                    GenerateOverallChart(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                }
+
+                index = mysel.indexOf("county");
+                if (index > -1) {
+                    let local_str = mysel.split(".");
+                    chart_title[chart_index] = `${local_str[0]}`;
+                    GenerateCountyChart(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                }
+            }
+
+            if (APP.myChart == 'bar') {
+                index = mysel.indexOf("timeseries");
+                if (index > -1) {
+                    let local_str = mysel.split(".");
+                    chart_title[chart_index] = `${local_str[0]}`;
+                    GenerateTimeSeriesChartBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                }
+
+                index = mysel.indexOf("overall");
+                if (index > -1) {
+                    let local_str = mysel.split(".");
+                    chart_title[chart_index] = `${local_str[0]}`;
+                    GenerateOverallChartBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                }
+
+                index = mysel.indexOf("county");
+                if (index > -1) {
+                    let local_str = mysel.split(".");
+                    chart_title[chart_index] = `${local_str[0]}`;
+                    GenerateCountyChartBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                }
+
+                index = mysel.indexOf("precinct");
+                if (index > -1) {
+                    let local_str = mysel.split(".");
+                    chart_title[chart_index] = `${local_str[0]}`;
+                    GeneratePrecinctsChartBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                }
+            }
+
+            if (APP.myChart == 'stacked bar') {
+                index = mysel.indexOf("timeseries");
+                if (index > -1) {
+                    let local_str = mysel.split(".");
+                    chart_title[chart_index] = `${local_str[0]}`;
+                    GenerateTimeSeriesChartStackedBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                }
+
+                index = mysel.indexOf("overall");
+                if (index > -1) {
+                    let local_str = mysel.split(".");
+                    chart_title[chart_index] = `${local_str[0]}`;
+                    GenerateOverallChartStackedBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                }
+
+                index = mysel.indexOf("county");
+                if (index > -1) {
+                    let local_str = mysel.split(".");
+                    chart_title[chart_index] = `${local_str[0]}`;
+                    GenerateCountyChartStackedBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                }
+
+                index = mysel.indexOf("precinct");
+                if (index > -1) {
+                    let local_str = mysel.split(".");
+                    chart_title[chart_index] = `${local_str[0]}`;
+                    GeneratePrecinctsChartStackedBar(myUrl, `${local_str[0]}`, ctx[chart_index]);
+                }
+            }
+
+            chart_url[chart_index] = myUrl;
+
+            if (chart_index < chart_cells) {
+                chart_index = chart_index + 1;
+            }
+            else {
+                chart_index = 0;
+            }
+        }
+
+        function RefreshChart(url, myTitle, ctx) {
+
+            let chartStatus = Chart.getChart(ctx);
+            if (chartStatus != undefined) {
+                chartStatus.destroy();
+            }
+
+            if (APP.myChart == 'line') {
+                var index = myTitle.indexOf("timeseries");
+                if (index > -1) {
+                    GenerateTimeSeriesChart(url, myTitle, ctx);
+                }
+
+                var index = myTitle.indexOf("overall");
+                if (index > -1) {
+                    GenerateOverallChart(url, myTitle, ctx);
+                }
+
+                var index = myTitle.indexOf("county");
+                if (index > -1) {
+                    GenerateCountyChart(url, myTitle, ctx);
+                }
+            }
+
+            if (APP.myChart == 'bar') {
+                var index = myTitle.indexOf("timeseries");
+                if (index > -1) {
+                    GenerateTimeSeriesChartBar(url, myTitle, ctx);
+                }
+
+                var index = myTitle.indexOf("overall");
+                if (index > -1) {
+                    GenerateOverallChartBar(url, myTitle, ctx);
+                }
+
+                var index = myTitle.indexOf("county");
+                if (index > -1) {
+                    GenerateCountyChartBar(url, myTitle, ctx);
+                }
+
+                var index = myTitle.indexOf("precinct");
+                if (index > -1) {
+                    GeneratePrecinctsChartBar(url, myTitle, ctx);
+                }
+            }
+
+            if (APP.myChart == 'stacked bar') {
+                var index = myTitle.indexOf("timeseries");
+                if (index > -1) {
+                    GenerateTimeSeriesChartStackedBar(url, myTitle, ctx);
+                }
+
+                var index = myTitle.indexOf("overall");
+                if (index > -1) {
+                    GenerateOverallChartStackedBar(url, myTitle, ctx);
+                }
+
+                var index = myTitle.indexOf("county");
+                if (index > -1) {
+                    GenerateCountyChartStackedBar(url, myTitle, ctx);
+                }
+
+                var index = myTitle.indexOf("precinct");
+                if (index > -1) {
+                    GeneratePrecinctsChartStackedBar(url, myTitle, ctx);
+                }
+            }
+        };
+
+        function RefreshAndUpdate() {
+            let now_time = new Date();
+            document.getElementById("mytime").innerHTML = now_time;
+            document.getElementById("myupdate").innerHTML = refresh_counter;
+            if (refresh_counter > 0) {
+                refresh_counter--;
+            }
+            else {
+                refresh_counter = refresh_rate;
+
+                for (i = 0; i < chart_cells; i++) {
+                    console.log('RefreshAndUpdate ' + `${chart_title[i]}`);
+                    RefreshChart(chart_url[i], chart_title[i], ctx[i]);
+                }
+            }
+
+        };
+
+        //define time interval and call user-defined waitAndshow function
+        APP.myIntervalId = setInterval(RefreshAndUpdate, 1000);
+
+    </script>
+
+</body>
+</html>
